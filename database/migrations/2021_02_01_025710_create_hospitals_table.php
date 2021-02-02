@@ -33,11 +33,11 @@ class CreateHospitalsTable extends Migration
             $table->date('started_at', 254);
             $table->string('responsible', 254)->nullable();
             $table->boolean('status');
-            $table->unsignedTinyInteger('condition', 254);
+            $table->unsignedTinyInteger('condition');
             $table->decimal('north', 19, 15);
             $table->decimal('east', 19, 15);
             $table->decimal('height', 19, 15);
-            $table->unsignedInteger('beds_quantity', 254);
+            $table->unsignedInteger('beds_quantity');
             $table->timestamps();
         });
     }
