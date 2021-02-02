@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Hospital;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class HospitalController extends Controller
 {
@@ -14,7 +15,7 @@ class HospitalController extends Controller
      */
     public function index()
     {
-        //
+        return Inertia::render('Map');
     }
 
     /**
