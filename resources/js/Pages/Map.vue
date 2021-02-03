@@ -37,25 +37,35 @@ export default {
   components: {
     AppLayout,
   },
+  props: {
+    hospitals: Array,
+  },
   data() {
     return {
-      initialLon: parseFloat(-74.945649),
-      initialLat: parseFloat(-11.641952),
-      lon: parseFloat(-75.217933000000002),
-      lat: parseFloat(-12.057532999999999),
+      initialLon: parseFloat(-11.641952),
+      initialLat: parseFloat(-74.945649),
       map: null,
       iconURL: 'https://raw.githubusercontent.com/do-community/travellist-laravel-demo/main/public/img/marker_togo.png',
     }
   },
   methods: {
     addMapPoint() {
+      const featuresArr = this.hospitals.map(hospital => {
+        const feature = new Feature({
+          geometry: new PointGeom(
+            transform([parseFloat(hospital.latitude), parseFloat(hospital.longitude)], 'EPSG:4326', 'EPSG:3857')
+          ),
+        })
+
+        feature.setProperties({ ...hospital })
+        feature.setId(hospital.id)
+
+        return feature
+      })
+
       const vectorLayer = new VectorLayer({
         source: new VectorSource({
-          features: [
-            new Feature({
-              geometry: new PointGeom(transform([parseFloat(this.lon), parseFloat(this.lat)], 'EPSG:4326', 'EPSG:3857')),
-            })
-          ]
+          features: [...featuresArr],
         }),
         style: new Style({
           image: new Icon({
@@ -64,7 +74,7 @@ export default {
             anchorYUnits: 'pixels',
             opacity: 0.75,
             src: this.iconURL,
-          })
+          }),
         })
       })
 
@@ -80,7 +90,7 @@ export default {
         })
       ],
       view: new View({
-        center: fromLonLat([this.initialLon, this.initialLat]),
+        center: fromLonLat([this.initialLat, this.initialLon]),
         zoom: 8,
         constrainResolution: true,
       })

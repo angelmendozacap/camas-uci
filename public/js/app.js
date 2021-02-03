@@ -5306,16 +5306,34 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var ol_Map__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ol/Map */ "./node_modules/ol/Map.js");
 /* harmony import */ var ol_View__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ol/View */ "./node_modules/ol/View.js");
-/* harmony import */ var ol_Feature__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ol/Feature */ "./node_modules/ol/Feature.js");
+/* harmony import */ var ol_Feature__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ol/Feature */ "./node_modules/ol/Feature.js");
 /* harmony import */ var ol_source_OSM__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ol/source/OSM */ "./node_modules/ol/source/OSM.js");
-/* harmony import */ var ol_source_Vector__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ol/source/Vector */ "./node_modules/ol/source/Vector.js");
-/* harmony import */ var ol_geom_Point__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ol/geom/Point */ "./node_modules/ol/geom/Point.js");
+/* harmony import */ var ol_source_Vector__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ol/source/Vector */ "./node_modules/ol/source/Vector.js");
+/* harmony import */ var ol_geom_Point__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ol/geom/Point */ "./node_modules/ol/geom/Point.js");
 /* harmony import */ var ol_proj__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ol/proj */ "./node_modules/ol/proj.js");
 /* harmony import */ var ol_layer_Tile__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ol/layer/Tile */ "./node_modules/ol/layer/Tile.js");
-/* harmony import */ var ol_layer_Vector__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ol/layer/Vector */ "./node_modules/ol/layer/Vector.js");
+/* harmony import */ var ol_layer_Vector__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ol/layer/Vector */ "./node_modules/ol/layer/Vector.js");
 /* harmony import */ var _Layouts_AppLayout__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/Layouts/AppLayout */ "./resources/js/Layouts/AppLayout.vue");
 /* harmony import */ var ol_style_Style__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ol/style/Style */ "./node_modules/ol/style/Style.js");
 /* harmony import */ var ol_style_Icon__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ol/style/Icon */ "./node_modules/ol/style/Icon.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 //
 //
 //
@@ -5352,23 +5370,30 @@ __webpack_require__.r(__webpack_exports__);
   components: {
     AppLayout: _Layouts_AppLayout__WEBPACK_IMPORTED_MODULE_1__.default
   },
+  props: {
+    hospitals: Array
+  },
   data: function data() {
     return {
-      initialLon: parseFloat(-74.945649),
-      initialLat: parseFloat(-11.641952),
-      lon: parseFloat(-75.217933000000002),
-      lat: parseFloat(-12.057532999999999),
+      initialLon: parseFloat(-11.641952),
+      initialLat: parseFloat(-74.945649),
       map: null,
       iconURL: 'https://raw.githubusercontent.com/do-community/travellist-laravel-demo/main/public/img/marker_togo.png'
     };
   },
   methods: {
     addMapPoint: function addMapPoint() {
-      var vectorLayer = new ol_layer_Vector__WEBPACK_IMPORTED_MODULE_2__.default({
-        source: new ol_source_Vector__WEBPACK_IMPORTED_MODULE_3__.default({
-          features: [new ol_Feature__WEBPACK_IMPORTED_MODULE_4__.default({
-            geometry: new ol_geom_Point__WEBPACK_IMPORTED_MODULE_5__.default((0,ol_proj__WEBPACK_IMPORTED_MODULE_0__.transform)([parseFloat(this.lon), parseFloat(this.lat)], 'EPSG:4326', 'EPSG:3857'))
-          })]
+      var featuresArr = this.hospitals.map(function (hospital) {
+        var feature = new ol_Feature__WEBPACK_IMPORTED_MODULE_2__.default({
+          geometry: new ol_geom_Point__WEBPACK_IMPORTED_MODULE_3__.default((0,ol_proj__WEBPACK_IMPORTED_MODULE_0__.transform)([parseFloat(hospital.latitude), parseFloat(hospital.longitude)], 'EPSG:4326', 'EPSG:3857'))
+        });
+        feature.setProperties(_objectSpread({}, hospital));
+        feature.setId(hospital.id);
+        return feature;
+      });
+      var vectorLayer = new ol_layer_Vector__WEBPACK_IMPORTED_MODULE_4__.default({
+        source: new ol_source_Vector__WEBPACK_IMPORTED_MODULE_5__.default({
+          features: _toConsumableArray(featuresArr)
         }),
         style: new ol_style_Style__WEBPACK_IMPORTED_MODULE_6__.default({
           image: new ol_style_Icon__WEBPACK_IMPORTED_MODULE_7__.default({
@@ -5390,7 +5415,7 @@ __webpack_require__.r(__webpack_exports__);
         source: new ol_source_OSM__WEBPACK_IMPORTED_MODULE_10__.default()
       })],
       view: new ol_View__WEBPACK_IMPORTED_MODULE_11__.default({
-        center: (0,ol_proj__WEBPACK_IMPORTED_MODULE_0__.fromLonLat)([this.initialLon, this.initialLat]),
+        center: (0,ol_proj__WEBPACK_IMPORTED_MODULE_0__.fromLonLat)([this.initialLat, this.initialLon]),
         zoom: 8,
         constrainResolution: true
       })

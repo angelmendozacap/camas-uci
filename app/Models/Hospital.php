@@ -8,4 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 class Hospital extends Model
 {
     use HasFactory;
+
+    protected $guarded = [];
+
+    protected $dates = [
+        'started_at',
+    ];
+
+    protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
+        'height' => 'float',
+        'status' => 'boolean',
+    ];
 }

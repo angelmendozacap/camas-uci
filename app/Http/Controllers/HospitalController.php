@@ -15,7 +15,9 @@ class HospitalController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Map');
+        $hospitals = Hospital::all();
+
+        return Inertia::render('Map', compact('hospitals'));
     }
 
     /**
