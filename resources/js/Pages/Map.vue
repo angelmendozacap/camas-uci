@@ -9,7 +9,11 @@
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
           <section class="p-4 bg-white border-b border-gray-200">
             <div class="h-0 w-full relative overflow-hidden ratio-16/9">
-              <div class="w-full h-full absolute top-0 left-0 object-cover rounded" ref="map-root"></div>
+              <div class="w-full h-full absolute top-0 left-0 object-cover rounded" ref="map-root">
+              </div>
+            </div>
+            <div class="bg-white shadow-lg absolute bottom-0 left-0 px-2 py-1 rounded" ref="pop-up">
+              <div ref="pop-up__info"></div>
             </div>
           </section>
         </div>
@@ -32,24 +36,26 @@ import VectorLayer from 'ol/layer/Vector';
 import AppLayout from "@/Layouts/AppLayout";
 import Style from 'ol/style/Style';
 import Icon from 'ol/style/Icon';
+import Overlay from 'ol/Overlay';
 
 export default {
   components: {
     AppLayout,
   },
   props: {
+    uciInfo: Object,
     hospitals: Array,
   },
   data() {
     return {
+      juninUCIInfo: this.uciInfo.departaments.find(d => d.department === 'JUNIN'),
       initialLon: parseFloat(-11.641952),
       initialLat: parseFloat(-74.945649),
       map: null,
-      iconURL: 'https://raw.githubusercontent.com/do-community/travellist-laravel-demo/main/public/img/marker_togo.png',
     }
   },
   methods: {
-    addMapPoint() {
+    addMapPoints() {
       const featuresArr = this.hospitals.map(hospital => {
         const feature = new Feature({
           geometry: new PointGeom(
@@ -57,8 +63,32 @@ export default {
           ),
         })
 
-        feature.setProperties({ ...hospital })
+        const uciInfo = this.juninUCIInfo.hospitals.find(h => h.hospital.includes(hospital.name))
+        const uciBeds = uciInfo ? {
+          has_uci_beds: true,
+          uci_available: uciInfo.uci_available,
+          uci_total: uciInfo.uci_total,
+        } : {
+          has_uci_beds: false,
+          uci_available: 0,
+          uci_total: 0,
+        }
+
+        const _iconURL = uciBeds.has_uci_beds ?
+        'https://raw.githubusercontent.com/do-community/travellist-laravel-demo/main/public/img/marker_visited.png' :
+        'https://raw.githubusercontent.com/do-community/travellist-laravel-demo/main/public/img/marker_togo.png'
+
+        feature.setProperties({ ...hospital, ...uciBeds })
         feature.setId(hospital.id)
+        feature.setStyle(new Style({
+          image: new Icon({
+            anchor: [0.5, 46],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'pixels',
+            opacity: 0.75,
+            src: _iconURL,
+          }),
+        }))
 
         return feature
       })
@@ -67,19 +97,37 @@ export default {
         source: new VectorSource({
           features: [...featuresArr],
         }),
-        style: new Style({
-          image: new Icon({
-            anchor: [0.5, 46],
-            anchorXUnits: 'fraction',
-            anchorYUnits: 'pixels',
-            opacity: 0.75,
-            src: this.iconURL,
-          }),
-        })
       })
 
       this.map.addLayer(vectorLayer)
-    }
+    },
+    addPopUpOverlay() {
+      const popUpOverlay = new Overlay({
+        element: this.$refs['pop-up'],
+        autoPan: true,
+        autoPanAnimation: { duration: 250 },
+      })
+
+      const _popUpInfoEl = this.$refs['pop-up__info']
+
+      this.map.on('singleclick', e => {
+        const _feature = this.map.forEachFeatureAtPixel(e.pixel, feature => feature)
+
+        if (_feature) {
+          const _props = _feature.getProperties()
+          console.log(_props)
+
+          _popUpInfoEl.innerHTML = `
+            <p>${_props.name}</p>
+          `
+          popUpOverlay.setPosition(e.coordinate);
+        } else {
+          _popUpInfoEl.innerHTML = ''
+        }
+      })
+
+      this.map.addOverlay(popUpOverlay)
+    },
   },
   mounted() {
     this.map = new Map({
@@ -96,7 +144,8 @@ export default {
       })
     })
 
-    this.addMapPoint()
+    this.addMapPoints()
+    this.addPopUpOverlay()
   }
 };
 </script>

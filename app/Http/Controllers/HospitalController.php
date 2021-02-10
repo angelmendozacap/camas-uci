@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Hospital;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class HospitalController extends Controller
@@ -15,9 +16,13 @@ class HospitalController extends Controller
      */
     public function index()
     {
-        $hospitals = Hospital::all();
-
-        return Inertia::render('Map', compact('hospitals'));
+        return Inertia::render('Map', [
+            'hospitals' => Hospital::all([
+                'id', 'institution', 'name', 'department', 'province',
+                'district', 'address', 'phone', 'latitude', 'longitude',
+            ]),
+            'uciInfo' => json_decode(Storage::disk('public')->get('data/uci_beds.json'), true)
+        ]);
     }
 
     /**

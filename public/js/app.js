@@ -5304,18 +5304,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var ol_Map__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ol/Map */ "./node_modules/ol/Map.js");
-/* harmony import */ var ol_View__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ol/View */ "./node_modules/ol/View.js");
+/* harmony import */ var ol_Map__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ol/Map */ "./node_modules/ol/Map.js");
+/* harmony import */ var ol_View__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ol/View */ "./node_modules/ol/View.js");
 /* harmony import */ var ol_Feature__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ol/Feature */ "./node_modules/ol/Feature.js");
-/* harmony import */ var ol_source_OSM__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ol/source/OSM */ "./node_modules/ol/source/OSM.js");
-/* harmony import */ var ol_source_Vector__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ol/source/Vector */ "./node_modules/ol/source/Vector.js");
+/* harmony import */ var ol_source_OSM__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ol/source/OSM */ "./node_modules/ol/source/OSM.js");
+/* harmony import */ var ol_source_Vector__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ol/source/Vector */ "./node_modules/ol/source/Vector.js");
 /* harmony import */ var ol_geom_Point__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ol/geom/Point */ "./node_modules/ol/geom/Point.js");
 /* harmony import */ var ol_proj__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ol/proj */ "./node_modules/ol/proj.js");
-/* harmony import */ var ol_layer_Tile__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ol/layer/Tile */ "./node_modules/ol/layer/Tile.js");
-/* harmony import */ var ol_layer_Vector__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ol/layer/Vector */ "./node_modules/ol/layer/Vector.js");
+/* harmony import */ var ol_layer_Tile__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ol/layer/Tile */ "./node_modules/ol/layer/Tile.js");
+/* harmony import */ var ol_layer_Vector__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ol/layer/Vector */ "./node_modules/ol/layer/Vector.js");
 /* harmony import */ var _Layouts_AppLayout__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/Layouts/AppLayout */ "./resources/js/Layouts/AppLayout.vue");
-/* harmony import */ var ol_style_Style__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ol/style/Style */ "./node_modules/ol/style/Style.js");
-/* harmony import */ var ol_style_Icon__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ol/style/Icon */ "./node_modules/ol/style/Icon.js");
+/* harmony import */ var ol_style_Style__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ol/style/Style */ "./node_modules/ol/style/Style.js");
+/* harmony import */ var ol_style_Icon__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ol/style/Icon */ "./node_modules/ol/style/Icon.js");
+/* harmony import */ var ol_Overlay__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ol/Overlay */ "./node_modules/ol/Overlay.js");
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -5354,6 +5355,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+
 
 
 
@@ -5371,56 +5377,107 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     AppLayout: _Layouts_AppLayout__WEBPACK_IMPORTED_MODULE_1__.default
   },
   props: {
+    uciInfo: Object,
     hospitals: Array
   },
   data: function data() {
     return {
+      juninUCIInfo: this.uciInfo.departaments.find(function (d) {
+        return d.department === 'JUNIN';
+      }),
       initialLon: parseFloat(-11.641952),
       initialLat: parseFloat(-74.945649),
-      map: null,
-      iconURL: 'https://raw.githubusercontent.com/do-community/travellist-laravel-demo/main/public/img/marker_togo.png'
+      map: null
     };
   },
   methods: {
-    addMapPoint: function addMapPoint() {
+    addMapPoints: function addMapPoints() {
+      var _this = this;
+
       var featuresArr = this.hospitals.map(function (hospital) {
         var feature = new ol_Feature__WEBPACK_IMPORTED_MODULE_2__.default({
           geometry: new ol_geom_Point__WEBPACK_IMPORTED_MODULE_3__.default((0,ol_proj__WEBPACK_IMPORTED_MODULE_0__.transform)([parseFloat(hospital.latitude), parseFloat(hospital.longitude)], 'EPSG:4326', 'EPSG:3857'))
         });
-        feature.setProperties(_objectSpread({}, hospital));
+
+        var uciInfo = _this.juninUCIInfo.hospitals.find(function (h) {
+          return h.hospital.includes(hospital.name);
+        });
+
+        var uciBeds = uciInfo ? {
+          has_uci_beds: true,
+          uci_available: uciInfo.uci_available,
+          uci_total: uciInfo.uci_total
+        } : {
+          has_uci_beds: false,
+          uci_available: 0,
+          uci_total: 0
+        };
+
+        var _iconURL = uciBeds.has_uci_beds ? 'https://raw.githubusercontent.com/do-community/travellist-laravel-demo/main/public/img/marker_visited.png' : 'https://raw.githubusercontent.com/do-community/travellist-laravel-demo/main/public/img/marker_togo.png';
+
+        feature.setProperties(_objectSpread(_objectSpread({}, hospital), uciBeds));
         feature.setId(hospital.id);
-        return feature;
-      });
-      var vectorLayer = new ol_layer_Vector__WEBPACK_IMPORTED_MODULE_4__.default({
-        source: new ol_source_Vector__WEBPACK_IMPORTED_MODULE_5__.default({
-          features: _toConsumableArray(featuresArr)
-        }),
-        style: new ol_style_Style__WEBPACK_IMPORTED_MODULE_6__.default({
-          image: new ol_style_Icon__WEBPACK_IMPORTED_MODULE_7__.default({
+        feature.setStyle(new ol_style_Style__WEBPACK_IMPORTED_MODULE_4__.default({
+          image: new ol_style_Icon__WEBPACK_IMPORTED_MODULE_5__.default({
             anchor: [0.5, 46],
             anchorXUnits: 'fraction',
             anchorYUnits: 'pixels',
             opacity: 0.75,
-            src: this.iconURL
+            src: _iconURL
           })
+        }));
+        return feature;
+      });
+      var vectorLayer = new ol_layer_Vector__WEBPACK_IMPORTED_MODULE_6__.default({
+        source: new ol_source_Vector__WEBPACK_IMPORTED_MODULE_7__.default({
+          features: _toConsumableArray(featuresArr)
         })
       });
       this.map.addLayer(vectorLayer);
+    },
+    addPopUpOverlay: function addPopUpOverlay() {
+      var _this2 = this;
+
+      var popUpOverlay = new ol_Overlay__WEBPACK_IMPORTED_MODULE_8__.default({
+        element: this.$refs['pop-up'],
+        autoPan: true,
+        autoPanAnimation: {
+          duration: 250
+        }
+      });
+      var _popUpInfoEl = this.$refs['pop-up__info'];
+      this.map.on('singleclick', function (e) {
+        var _feature = _this2.map.forEachFeatureAtPixel(e.pixel, function (feature) {
+          return feature;
+        });
+
+        if (_feature) {
+          var _props = _feature.getProperties();
+
+          console.log(_props);
+          _popUpInfoEl.innerHTML = "\n            <p>".concat(_props.name, "</p>\n          ");
+          popUpOverlay.setPosition(e.coordinate);
+        } else {
+          _popUpInfoEl.innerHTML = '';
+        }
+      });
+      this.map.addOverlay(popUpOverlay);
     }
   },
   mounted: function mounted() {
-    this.map = new ol_Map__WEBPACK_IMPORTED_MODULE_8__.default({
+    this.map = new ol_Map__WEBPACK_IMPORTED_MODULE_9__.default({
       target: this.$refs['map-root'],
-      layers: [new ol_layer_Tile__WEBPACK_IMPORTED_MODULE_9__.default({
-        source: new ol_source_OSM__WEBPACK_IMPORTED_MODULE_10__.default()
+      layers: [new ol_layer_Tile__WEBPACK_IMPORTED_MODULE_10__.default({
+        source: new ol_source_OSM__WEBPACK_IMPORTED_MODULE_11__.default()
       })],
-      view: new ol_View__WEBPACK_IMPORTED_MODULE_11__.default({
+      view: new ol_View__WEBPACK_IMPORTED_MODULE_12__.default({
         center: (0,ol_proj__WEBPACK_IMPORTED_MODULE_0__.fromLonLat)([this.initialLat, this.initialLon]),
         zoom: 8,
         constrainResolution: true
       })
     });
-    this.addMapPoint();
+    this.addMapPoints();
+    this.addPopUpOverlay();
   }
 });
 
@@ -79371,6 +79428,16 @@ var render = function() {
                           "w-full h-full absolute top-0 left-0 object-cover rounded"
                       })
                     ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    {
+                      ref: "pop-up",
+                      staticClass:
+                        "bg-white shadow-lg absolute bottom-0 left-0 px-2 py-1 rounded"
+                    },
+                    [_c("div", { ref: "pop-up__info" })]
                   )
                 ]
               )
