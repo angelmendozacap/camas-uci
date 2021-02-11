@@ -5359,6 +5359,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
 
 
 
@@ -5454,11 +5456,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         if (_feature) {
           var _props = _feature.getProperties();
 
-          console.log(_props);
-          _popUpInfoEl.innerHTML = "\n            <p>".concat(_props.name, "</p>\n          ");
+          _popUpInfoEl.innerHTML = "\n            <header class=\"mb-1\">\n              <h3 class=\"text-indigo-800 text-sm uppercase tracking-tight\">".concat(_props.name, "</h3>\n              ").concat(_props.has_uci_beds && _props.uci_available > 0 ? '<p class="text-sm font-bold text-green-600">Camas UCI disponibles</p>' : '<p class="text-sm font-bold text-red-500">Camas UCI NO disponibles</p>', "\n            </header>\n            <section class=\"text-sm text-gray-800\">\n              <ul>\n                <li>\n                  Camas UCI disponibles: <span class=\"font-bold\">").concat(_props.uci_available, "</span>\n                </li>\n                <li>\n                  Camas UCI total: <span class=\"font-bold\">").concat(_props.uci_total, "</span>\n                </li>\n              </ul>\n            </section>\n          ");
           popUpOverlay.setPosition(e.coordinate);
         } else {
           _popUpInfoEl.innerHTML = '';
+          popUpOverlay.setPosition(undefined);
         }
       });
       this.map.addOverlay(popUpOverlay);
@@ -79422,24 +79424,39 @@ var render = function() {
                         "h-0 w-full relative overflow-hidden ratio-16/9"
                     },
                     [
-                      _c("div", {
-                        ref: "map-root",
-                        staticClass:
-                          "w-full h-full absolute top-0 left-0 object-cover rounded"
-                      })
+                      _c(
+                        "div",
+                        {
+                          ref: "map-root",
+                          staticClass:
+                            "w-full h-full absolute top-0 left-0 object-cover rounded"
+                        },
+                        [
+                          _c(
+                            "div",
+                            {
+                              ref: "pop-up",
+                              staticClass:
+                                "bg-white shadow-lg absolute bottom-0 left-0 px-3 py-2 rounded w-56"
+                            },
+                            [
+                              _c("div", {
+                                ref: "pop-up__info",
+                                staticClass: "w-full"
+                              })
+                            ]
+                          )
+                        ]
+                      )
                     ]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "div",
-                    {
-                      ref: "pop-up",
-                      staticClass:
-                        "bg-white shadow-lg absolute bottom-0 left-0 px-2 py-1 rounded"
-                    },
-                    [_c("div", { ref: "pop-up__info" })]
                   )
                 ]
+              ),
+              _vm._v(" "),
+              _c(
+                "section",
+                { staticClass: "p-4 bg-white border-b border-gray-200" },
+                [_vm._v("asa")]
               )
             ]
           )

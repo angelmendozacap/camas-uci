@@ -10,12 +10,14 @@
           <section class="p-4 bg-white border-b border-gray-200">
             <div class="h-0 w-full relative overflow-hidden ratio-16/9">
               <div class="w-full h-full absolute top-0 left-0 object-cover rounded" ref="map-root">
+                <div class="bg-white shadow-lg absolute bottom-0 left-0 px-3 py-2 rounded w-56" ref="pop-up">
+                  <div ref="pop-up__info" class="w-full"></div>
+                </div>
               </div>
             </div>
-            <div class="bg-white shadow-lg absolute bottom-0 left-0 px-2 py-1 rounded" ref="pop-up">
-              <div ref="pop-up__info"></div>
-            </div>
           </section>
+
+          <section class="p-4 bg-white border-b border-gray-200">asa</section>
         </div>
       </div>
     </div>
@@ -115,14 +117,29 @@ export default {
 
         if (_feature) {
           const _props = _feature.getProperties()
-          console.log(_props)
 
           _popUpInfoEl.innerHTML = `
-            <p>${_props.name}</p>
+            <header class="mb-1">
+              <h3 class="text-indigo-800 text-sm uppercase tracking-tight">${_props.name}</h3>
+              ${_props.has_uci_beds && _props.uci_available > 0
+                ? '<p class="text-sm font-bold text-green-600">Camas UCI disponibles</p>'
+                : '<p class="text-sm font-bold text-red-500">Camas UCI NO disponibles</p>'}
+            </header>
+            <section class="text-sm text-gray-800">
+              <ul>
+                <li>
+                  Camas UCI disponibles: <span class="font-bold">${_props.uci_available}</span>
+                </li>
+                <li>
+                  Camas UCI total: <span class="font-bold">${_props.uci_total}</span>
+                </li>
+              </ul>
+            </section>
           `
           popUpOverlay.setPosition(e.coordinate);
         } else {
           _popUpInfoEl.innerHTML = ''
+          popUpOverlay.setPosition(undefined);
         }
       })
 
