@@ -7,7 +7,27 @@
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-          <section class="p-4 bg-white border-b border-gray-200">
+          <header class="px-4 pt-4 bg-white">
+            <div class="bg-indigo-100 rounded px-6 py-4 grid grid-cols-2">
+              <div class="grid grid-cols-2 gap-x-1">
+                <div class="flex items-center">
+                  <img src="https://raw.githubusercontent.com/do-community/travellist-laravel-demo/main/public/img/marker_visited.png" alt="">
+                  <span class="ml-2">
+                    Hospitales CON camas UCI
+                  </span>
+                </div>
+
+                <div class="flex items-center">
+                  <img src="https://raw.githubusercontent.com/do-community/travellist-laravel-demo/main/public/img/marker_togo.png" alt="">
+                  <span class="ml-2">
+                    Hospitales SIN camas UCI
+                  </span>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <section class="p-4 bg-white">
             <div class="h-0 w-full relative overflow-hidden ratio-16/9">
               <div class="w-full h-full absolute top-0 left-0 object-cover rounded" ref="map-root">
                 <div class="bg-white shadow-lg absolute bottom-0 left-0 px-3 py-2 rounded w-56" ref="pop-up">
@@ -17,7 +37,10 @@
             </div>
           </section>
 
-          <section class="p-4 bg-white border-b border-gray-200">asa</section>
+          <section class="p-4 bg-white border-b border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <UCIJuninPie :uciInfo="juninUCIInfo" />
+            <UCIPeruPie :uciInfo="uciInfo" />
+          </section>
         </div>
       </div>
     </div>
@@ -34,15 +57,19 @@ import PointGeom from 'ol/geom/Point';
 import { fromLonLat, transform } from 'ol/proj';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
-
-import AppLayout from "@/Layouts/AppLayout";
 import Style from 'ol/style/Style';
 import Icon from 'ol/style/Icon';
 import Overlay from 'ol/Overlay';
 
+import AppLayout from "@/Layouts/AppLayout";
+import UCIJuninPie from "@/Components/Charts/UCIJuninPie";
+import UCIPeruPie from "@/Components/Charts/UCIPeruPie";
+
 export default {
   components: {
     AppLayout,
+    UCIJuninPie,
+    UCIPeruPie,
   },
   props: {
     uciInfo: Object,
