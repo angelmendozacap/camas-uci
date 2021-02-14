@@ -4,23 +4,36 @@
       <h2 class="font-semibold text-xl text-gray-800 leading-tight">Mapa</h2>
     </template>
 
-    <div class="py-12">
+    <div class="py-12 leading-tight">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
           <header class="px-4 pt-4 bg-white">
-            <div class="bg-indigo-100 rounded px-6 py-4 grid grid-cols-2">
-              <div class="grid grid-cols-2 gap-x-1">
-                <div class="flex items-center">
+            <div class="bg-indigo-100 rounded px-6 py-4">
+              <div class="grid gap-y-2 md:grid-cols-3 md:gap-x-1">
+                <div class="flex items-center justify-center">
                   <img src="https://raw.githubusercontent.com/do-community/travellist-laravel-demo/main/public/img/marker_visited.png" alt="">
                   <span class="ml-2">
                     Hospitales CON camas UCI
                   </span>
                 </div>
 
-                <div class="flex items-center">
+                <div class="flex items-center justify-center">
                   <img src="https://raw.githubusercontent.com/do-community/travellist-laravel-demo/main/public/img/marker_togo.png" alt="">
                   <span class="ml-2">
                     Hospitales SIN camas UCI
+                  </span>
+                </div>
+
+                <div v-if="!wasFoundMe" class="flex items-center justify-center">
+                  <button @click="geoFindMe" type="button" class="inline-flex md:block items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Encontrar hospital cerca de mí
+                  </button>
+                </div>
+
+                <div v-else class="flex items-center justify-center">
+                  <img src="https://user-images.githubusercontent.com/47567418/107866318-5f8bf400-6e3d-11eb-9276-c7531dc1f74f.png" alt="">
+                  <span class="ml-2">
+                    Tu ubicación
                   </span>
                 </div>
               </div>
@@ -78,9 +91,10 @@ export default {
   data() {
     return {
       juninUCIInfo: this.uciInfo.departaments.find(d => d.department === 'JUNIN'),
-      initialLon: parseFloat(-11.641952),
-      initialLat: parseFloat(-74.945649),
+      initialLat: parseFloat(-11.641952),
+      initialLon: parseFloat(-74.945649),
       map: null,
+      wasFoundMe: false,
     }
   },
   methods: {
@@ -117,7 +131,7 @@ export default {
             opacity: 0.75,
             src: _iconURL,
           }),
-        }))
+        }));
 
         return feature
       })
@@ -172,6 +186,53 @@ export default {
 
       this.map.addOverlay(popUpOverlay)
     },
+    geoFindMe() {
+      if (!navigator.geolocation){
+        console.error("Geolocation is not supported by your browser");
+        return;
+      }
+
+      const success = position => {
+        this.wasFoundMe = true
+
+        const latitude  = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        const feature = new Feature({
+          geometry: new PointGeom(
+            transform([parseFloat(longitude), parseFloat(latitude)], 'EPSG:4326', 'EPSG:3857')
+          ),
+        });
+
+        feature.setStyle(new Style({
+          image: new Icon({
+            anchor: [0.6, 48],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'pixels',
+            src: 'https://user-images.githubusercontent.com/47567418/107866318-5f8bf400-6e3d-11eb-9276-c7531dc1f74f.png',
+          }),
+        }));
+
+        const vectorLayer = new VectorLayer({
+          source: new VectorSource({
+            features: [feature],
+          }),
+        });
+
+        this.map.getView().setCenter(fromLonLat([parseFloat(longitude), parseFloat(latitude)]))
+        this.map.addLayer(vectorLayer)
+      };
+
+      function error(error) {
+        console.info(error)
+        console.error("Unable to retrieve your location", error.code, error.message);
+      };
+
+      navigator.geolocation.getCurrentPosition(success, error,  {
+        maximumAge: 5 * 60 * 1000,
+        timeout: 10 * 1000,
+      });
+    },
   },
   mounted() {
     this.map = new Map({
@@ -182,7 +243,7 @@ export default {
         })
       ],
       view: new View({
-        center: fromLonLat([this.initialLat, this.initialLon]),
+        center: fromLonLat([this.initialLon, this.initialLat]),
         zoom: 8,
         constrainResolution: true,
       })
