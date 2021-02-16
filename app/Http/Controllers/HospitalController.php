@@ -16,7 +16,7 @@ class HospitalController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Map', [
+        return Inertia::render('Hospitals/Map', [
             'hospitals' => Hospital::all([
                 'id', 'institution', 'name', 'department', 'province',
                 'district', 'address', 'phone', 'latitude', 'longitude',
@@ -54,7 +54,9 @@ class HospitalController extends Controller
      */
     public function show(Hospital $hospital)
     {
-        //
+        return Inertia::render('Hospitals/Show', [
+            'hospital' => $hospital,
+        ]);
     }
 
     /**
